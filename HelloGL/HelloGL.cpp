@@ -23,6 +23,8 @@ HelloGL::HelloGL(int argc, char* argv[])
 	glViewport(0, 0, 800, 800);
 	gluPerspective(45, 1, 0, 1000);
 	glMatrixMode(GL_MODELVIEW);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	glutMainLoop();
 }
 
@@ -39,15 +41,9 @@ void HelloGL::Display()
 	glTranslatef(0.0f, 0.0f, -5.0f);
 	glRotatef(mRotation, -1.0f, -1.0f, -1.0f);
 
-	glutWireTeapot(1);
 	
-	glBegin(GL_POLYGON);
-		/*glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
-		glVertex2f(-0.75, 0.5);
-		glVertex2f(0.75, 0.5);
-		glVertex2f(0.75, -0.5);
-		glVertex2f(-0.75, -0.5);*/
-	glEnd();
+
+	DrawCube();
 
 	glPopMatrix();
 
@@ -76,8 +72,112 @@ void HelloGL::Update()
 
 void HelloGL::Keyboard(unsigned char key, int x, int y)
 {
+	/*
+	mCamera->eye.x += 0.1; Moves the camera to the left
+	mCamera->eye.x -= 0.1; Moves the camera to the right
+
+	mCamera->eye.y -= 0.1; Moves the camera up
+	mCamera->eye.y += 0.1; Moves the camer down
+
+	mCamera->eye.z -= 0.1; Zooms in
+	mCamera->eye.z += 0.1; Zooms out
+	*/
+
+
 	if (key == 'd')
 	{
-		mRotation += 0.5f;
+		mCamera->eye.z += 0.1;
 	}
+}
+
+void HelloGL::DrawCube()
+{
+	glBegin(GL_TRIANGLES);
+
+	//face v0-v1-v2
+	glColor3f(1, 1, 1);
+	glVertex3f(1, 1, 1);
+	glColor3f(1, 1, 0);
+	glVertex3f(-1, 1, 1);
+	glColor3f(1, 0, 0);
+	glVertex3f(-1, -1, 1);
+
+	glColor3f(1, 0, 0);
+	glVertex3f(-1, -1, 1);
+	glColor3f(1, 0, 1);
+	glVertex3f(1, -1, 1);
+	glColor3f(1, 1, 1);
+	glVertex3f(1, 1, 1);
+
+	glColor3f(1, 1, 1);
+	glVertex3f(1, 1, 1);
+	glColor3f(1, 0, 1);
+	glVertex3f(1, -1, 1);
+	glColor3f(0, 0, 1);
+	glVertex3f(1, -1, -1);
+
+	glColor3f(0, 0, 1);
+	glVertex3f(1, -1, -1);
+	glColor3f(0, 1, 1);
+	glVertex3f(1, 1, -1);
+	glColor3f(1, 1, 1);
+	glVertex3f(1, 1, 1);
+
+	glColor3f(1, 1, 1);
+	glVertex3f(1, 1, 1);
+	glColor3f(0, 1, 1);
+	glVertex3f(1, 1, -1);
+	glColor3f(0, 1, 0);
+	glVertex3f(-1, 1, -1);
+
+	glColor3f(0, 1, 0);
+	glVertex3f(-1, 1, -1);
+	glColor3f(1, 1, 0);
+	glVertex3f(-1, 1, 1);
+	glColor3f(1, 1, 1);
+	glVertex3f(1, 1, 1);
+
+	glColor3f(1, 1, 0);
+	glVertex3f(-1, 1, 1);
+	glColor3f(0, 1, 0);
+	glVertex3f(-1, 1, -1);
+	glColor3f(0, 0, 0);
+	glVertex3f(-1, -1, -1);
+
+	glColor3f(0, 0, 0);
+	glVertex3f(-1, -1, -1);
+	glColor3f(1, 0, 0);
+	glVertex3f(-1, -1, 1);
+	glColor3f(1, 1, 0);
+	glVertex3f(-1, 1, 1);
+
+	glColor3f(0, 0, 0);
+	glVertex3f(-1, -1, -1);
+	glColor3f(0, 0, 1);
+	glVertex3f(1, -1, -1);
+	glColor3f(1, 0, 1);
+	glVertex3f(1, -1, 1);
+
+	glColor3f(1, 0, 1);
+	glVertex3f(1, -1, 1);
+	glColor3f(1, 0, 0);
+	glVertex3f(-1, -1, 1);
+	glColor3f(0, 0, 0);
+	glVertex3f(-1, -1, -1);
+
+	glColor3f(0, 0, 1);
+	glVertex3f(1, -1, -1);
+	glColor3f(0, 0, 0);
+	glVertex3f(-1, -1, -1);
+	glColor3f(0, 1, 0);
+	glVertex3f(-1, 1, -1);
+
+	glColor3f(0, 1, 0);
+	glVertex3f(-1, 1, -1);
+	glColor3f(0, 1, 1);
+	glVertex3f(1, 1, -1);
+	glColor3f(0, 0, 1);
+	glVertex3f(1, -1, -1);
+
+	glEnd();
 }

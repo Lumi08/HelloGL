@@ -18,16 +18,6 @@ struct Camera
 	Vector3 eye, center, up;
 };
 
-struct Color
-{
-	GLfloat r, g, b;
-};
-
-struct Vertex
-{
-	GLfloat x, y, z;
-};
-
 class HelloGL
 {
 public:
