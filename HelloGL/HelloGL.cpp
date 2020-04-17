@@ -2,7 +2,13 @@
 
 HelloGL::HelloGL(int argc, char* argv[])
 {
-	rotation = 0.0f;
+	mRotation = 0.0f;
+	
+	mCamera = new Camera();
+	mCamera->eye = Vector3{ 0.0f, 0.0f, 1.0f };
+	mCamera->center = Vector3{ 0.0f, 0.0f, 0.0f };
+	mCamera->up = Vector3{ 0.0f, 1.0f, 0.0f };
+
 
 	GLUTCallbacks::Init(this);
 	glutInit(&argc, argv);
@@ -12,6 +18,11 @@ HelloGL::HelloGL(int argc, char* argv[])
 	glutDisplayFunc(GLUTCallbacks::Display);
 	glutKeyboardFunc(GLUTCallbacks::Keyboard);
 	glutTimerFunc(REFRESHRATE, GLUTCallbacks::Timer, REFRESHRATE);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glViewport(0, 0, 800, 800);
+	gluPerspective(45, 1, 0, 1000);
+	glMatrixMode(GL_MODELVIEW);
 	glutMainLoop();
 }
 
@@ -25,14 +36,17 @@ void HelloGL::Display()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glPushMatrix();
-	glRotatef(rotation, 0.0f, 0.0f, -1.0f);
+	glTranslatef(0.0f, 0.0f, -5.0f);
+	glRotatef(mRotation, -1.0f, -1.0f, -1.0f);
 
+	glutWireTeapot(1);
+	
 	glBegin(GL_POLYGON);
-		glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
+		/*glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
 		glVertex2f(-0.75, 0.5);
 		glVertex2f(0.75, 0.5);
 		glVertex2f(0.75, -0.5);
-		glVertex2f(-0.75, -0.5);
+		glVertex2f(-0.75, -0.5);*/
 	glEnd();
 
 	glPopMatrix();
@@ -43,12 +57,18 @@ void HelloGL::Display()
 
 void HelloGL::Update()
 {
-	Sleep(10);
-	//rotation += 0.5;
+	glLoadIdentity(); // loads identity matrix
+	gluLookAt(mCamera->eye.x, mCamera->eye.y, mCamera->eye.z,
+		mCamera->center.x, mCamera->center.y, mCamera->center.z,
+		mCamera->up.x, mCamera->up.y, mCamera->up.z); //where to look in the scene
 
-	if (rotation > 360.0f)
+
+	//Sleep(10);
+	mRotation += 0.5;
+
+	if (mRotation > 360.0f)
 	{
-		rotation = 0.0f;
+		mRotation = 0.0f;
 	}
 
 	glutPostRedisplay();
@@ -58,6 +78,6 @@ void HelloGL::Keyboard(unsigned char key, int x, int y)
 {
 	if (key == 'd')
 	{
-		rotation += 0.5f;
+		mRotation += 0.5f;
 	}
 }
