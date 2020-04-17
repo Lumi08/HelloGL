@@ -6,9 +6,11 @@ HelloGL::HelloGL(int argc, char* argv[])
 
 	GLUTCallbacks::Init(this);
 	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE);
 	glutInitWindowSize(800, 800);
 	glutCreateWindow("Simple OpenGL Program");
 	glutDisplayFunc(GLUTCallbacks::Display);
+	glutKeyboardFunc(GLUTCallbacks::Keyboard);
 	glutTimerFunc(REFRESHRATE, GLUTCallbacks::Timer, REFRESHRATE);
 	glutMainLoop();
 }
@@ -36,11 +38,13 @@ void HelloGL::Display()
 	glPopMatrix();
 
 	glFlush();
+	glutSwapBuffers();
 }
 
 void HelloGL::Update()
 {
-	rotation += 0.5;
+	Sleep(10);
+	//rotation += 0.5;
 
 	if (rotation > 360.0f)
 	{
@@ -48,4 +52,12 @@ void HelloGL::Update()
 	}
 
 	glutPostRedisplay();
+}
+
+void HelloGL::Keyboard(unsigned char key, int x, int y)
+{
+	if (key == 'd')
+	{
+		rotation += 0.5f;
+	}
 }

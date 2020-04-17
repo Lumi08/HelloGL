@@ -27,8 +27,18 @@ namespace GLUTCallbacks
 	{
 		if (helloGl != nullptr)
 		{
+			int updateTime = glutGet(GLUT_ELAPSED_TIME);
 			helloGl->Update();
-			glutTimerFunc(preferredRefresh, Timer, preferredRefresh);
+			updateTime = glutGet(GLUT_ELAPSED_TIME) - updateTime;
+			glutTimerFunc(preferredRefresh - updateTime, Timer, preferredRefresh);
+		}
+	}
+
+	void Keyboard(unsigned char key, int x, int y)
+	{
+		if (helloGl != nullptr)
+		{
+			helloGl->Keyboard(key, x, y);
 		}
 	}
 }
