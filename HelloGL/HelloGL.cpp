@@ -17,5 +17,13 @@ HelloGL::~HelloGL(void)
 
 void HelloGL::Display()
 {
-
+	glClear(GL_COLOR_BUFFER_BIT);
+	glBegin(GL_POLYGON);
+		glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
+		glVertex2f(-0.75, 0.5);
+		glVertex2f(0.75, 0.5);
+		glVertex2f(0.75, -0.5);
+		glVertex2f(-0.75, -0.5);
+	glEnd();
+	glFlush();
 }
