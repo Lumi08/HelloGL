@@ -6,6 +6,8 @@
 
 #include "GLUTCallbacks.h"
 
+#define REFRESHRATE			16
+
 class HelloGL
 {
 public:
@@ -16,5 +18,9 @@ public:
 	~HelloGL(void);
 
 	void Display();
+	void Update();
+
+private: 
+	float rotation;
 };
 

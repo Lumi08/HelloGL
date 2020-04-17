@@ -22,4 +22,13 @@ namespace GLUTCallbacks
 			helloGl->Display();
 		}
 	}
+
+	void Timer(int preferredRefresh)
+	{
+		if (helloGl != nullptr)
+		{
+			helloGl->Update();
+			glutTimerFunc(preferredRefresh, Timer, preferredRefresh);
+		}
+	}
 }
