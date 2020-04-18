@@ -4,9 +4,10 @@
 #include <gl/GLU.h> // OpenGl
 #include "GL/freeglut.h" // freeglut library
 
+#include "SceneObject.h"
 #include "Structures.h"
 
-class Cube
+class Cube : public SceneObject
 {
 public:
 	Cube(Mesh* mesh, float x, float y, float z);
@@ -16,8 +17,6 @@ public:
 	void Update();
 
 private:
-	Mesh* mMesh;
-
 	Vector3* mPosition;
 };
 

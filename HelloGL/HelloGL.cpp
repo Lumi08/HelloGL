@@ -15,11 +15,16 @@ void HelloGL::InitObjects()
 	mCamera->center = Vector3{ 0.0f, 0.0f, 0.0f };
 	mCamera->up = Vector3{ 0.0f, 1.0f, 0.0f };
 
-	Mesh* cubeMesh = MeshLoader::Load((char*)"Pyramid.txt");
+	Mesh* cubeMesh = MeshLoader::Load((char*)"Cube.txt");
+	Mesh* pyramidMesh = MeshLoader::Load((char*)"Pyramid.txt");
 
 	for (int i = 0; i < 100; i++)
 	{
-		mCube[i] = new Cube(cubeMesh, ((rand() % 400) / 10.0f) - 20.0f, ((rand() % 200) / 10.0f) - 10.0f, -(rand() % 1000) / 10.0f);
+		mObjects[i] = new Cube(cubeMesh, ((rand() % 400) / 10.0f) - 20.0f, ((rand() % 200) / 10.0f) - 10.0f, -(rand() % 1000) / 10.0f);
+	}
+	for (int i = 100; i < 200; i++)
+	{
+		mObjects[i] = new Cube(pyramidMesh, ((rand() % 400) / 10.0f) - 20.0f, ((rand() % 200) / 10.0f) - 10.0f, -(rand() % 1000) / 10.0f);
 	}
 }
 
@@ -53,14 +58,10 @@ void HelloGL::Display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	
-
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 200; i++)
 	{
-		mCube[i]->Draw();
+		mObjects[i]->Draw();
 	}
-
-	
 
 	glFlush();
 	glutSwapBuffers();

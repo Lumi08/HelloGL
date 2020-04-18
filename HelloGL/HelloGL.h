@@ -6,6 +6,7 @@
 
 #include "GLUTCallbacks.h"
 #include "Structures.h"
+#include "SceneObject.h"
 #include "Cube.h"
 #include "MeshLoader.h"
 
@@ -27,7 +28,7 @@ public:
 
 private: 
 	Camera* mCamera;
-	Cube* mCube[100];
+	SceneObject* mObjects[200];
 	float mRotation;
 
 	void InitObjects();

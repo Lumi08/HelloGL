@@ -2,10 +2,9 @@
 #include <iostream>
 #include <fstream>
 
-Cube::Cube(Mesh* mesh, float x, float y, float z)
+Cube::Cube(Mesh* mesh, float x, float y, float z) : SceneObject(mesh)
 {
 	mPosition = new Vector3{ x, y, z };
-	mMesh = mesh;
 }
 
 Cube::~Cube()
