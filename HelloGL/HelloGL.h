@@ -7,6 +7,7 @@
 #include "GLUTCallbacks.h"
 #include "Structures.h"
 #include "Cube.h"
+#include "MeshLoader.h"
 
 #define REFRESHRATE		16
 

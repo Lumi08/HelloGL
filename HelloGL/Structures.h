@@ -23,3 +23,13 @@ struct Vertex
 {
 	GLfloat x, y, z;
 };
+
+struct Mesh
+{
+	Vertex* Vertices;
+	Color* Color;
+	GLushort* Indices;
+	int VertexCount,
+		ColorCount,
+		IndexCount;
+};
