@@ -5,28 +5,10 @@
 #include "GL/freeglut.h" // freeglut library
 
 #include "GLUTCallbacks.h"
+#include "Structures.h"
+#include "Cube.h"
 
 #define REFRESHRATE		16
-
-struct Vector3
-{
-	float x, y, z;
-};
-
-struct Camera
-{
-	Vector3 eye, center, up;
-};
-
-struct Color
-{
-	GLfloat r, g, b;
-};
-
-struct Vertex
-{
-	GLfloat x, y, z;
-};
 
 class HelloGL
 {
@@ -44,8 +26,10 @@ public:
 
 private: 
 	Camera* mCamera;
+	Cube* mCube[100];
 	float mRotation;
 
-	void DrawCube();
+	void InitObjects();
+	void InitGL(int argc, char* argv[]);
 };
 
