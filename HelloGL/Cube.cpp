@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-Cube::Cube(Mesh* mesh, float x, float y, float z) : SceneObject(mesh)
+Cube::Cube(Mesh* mesh, Texture2D* texture, float x, float y, float z) : SceneObject(mesh, texture)
 {
 	mPosition = new Vector3{ x, y, z };
 }
@@ -14,27 +14,34 @@ Cube::~Cube()
 
 void Cube::Draw()
 {
-	if (mMesh->Vertices != nullptr && mMesh->VertexCount != 0 &&
-		mMesh->Color != nullptr && mMesh->ColorCount != 0 &&
-		mMesh->Indices != nullptr && mMesh->IndexCount != 0)
+	if (mMesh != nullptr)
 	{
-		
-		glPushMatrix();
-		glTranslatef(mPosition->x, mPosition->y, mPosition->z);
-		//glRotatef(mRotation, 1.0f, 0.0f, 1.0f);
+		if (mMesh->Vertices != nullptr && mMesh->VertexCount != 0 &&
+			mMesh->Color != nullptr && mMesh->ColorCount != 0 &&
+			mMesh->Indices != nullptr && mMesh->IndexCount != 0)
+		{
+			glBindTexture(GL_TEXTURE_2D, mTexture->GetID());
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_COLOR_ARRAY);
 
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, 0, mMesh->Vertices);
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(3, GL_FLOAT, 0, mMesh->Color);
+			//glPushMatrix();
+			glTranslatef(mPosition->x, mPosition->y, mPosition->z);																
+			//glRotatef(mRotation, 1.0f, 0.0f, 1.0f);
 
-		glPushMatrix();
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, mMesh->Indices);
-		glPopMatrix();
+			glVertexPointer(3, GL_FLOAT, 0, mMesh->Vertices);
+			glColorPointer(3, GL_FLOAT, 0, mMesh->Color);
+			glTexCoordPointer(2, GL_FLOAT, 0, mMesh->TexCoords);
 
-		glDisableClientState(GL_COLOR_ARRAY);
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glPopMatrix();
+			glPushMatrix();
+			glDrawElements(GL_TRIANGLES, mMesh->IndexCount, GL_UNSIGNED_SHORT, mMesh->Indices);
+			glPopMatrix();
+
+			glDisableClientState(GL_COLOR_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			//glPopMatrix();
+		}
 	}
 }
 

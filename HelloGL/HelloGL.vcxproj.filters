@@ -33,6 +33,9 @@
     <ClCompile Include="SceneObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HelloGL.h">
@@ -53,12 +56,15 @@
     <ClInclude Include="SceneObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Texture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Cube.txt">
+    <Text Include="Text Files\Cube.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="Pyramid.txt">
+    <Text Include="Text Files\Pyramid.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

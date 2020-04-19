@@ -129,6 +129,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
     <ClCompile Include="SceneObject.cpp" />
+    <ClCompile Include="Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cube.h" />
@@ -137,10 +138,11 @@
     <ClInclude Include="MeshLoader.h" />
     <ClInclude Include="SceneObject.h" />
     <ClInclude Include="Structures.h" />
+    <ClInclude Include="Texture2D.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Cube.txt" />
-    <Text Include="Pyramid.txt" />
+    <Text Include="Text Files\Cube.txt" />
+    <Text Include="Text Files\Pyramid.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

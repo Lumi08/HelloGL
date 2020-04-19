@@ -25,11 +25,15 @@ public:
 	void Update();
 
 	void Keyboard(unsigned char key, int x, int y);
+	void Mouse(int button, int state, int x, int y);
+
 
 private: 
 	Camera* mCamera;
 	SceneObject* mObjects[200];
 	float mRotation;
+
+	SceneObject* cube;
 
 	void InitObjects();
 	void InitGL(int argc, char* argv[]);
