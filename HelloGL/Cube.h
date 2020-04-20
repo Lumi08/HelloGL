@@ -18,5 +18,6 @@ public:
 	void Update();
 
 private:
-	Vector3* mPosition;
+	Material* mMaterial;
+	float mRotation;
 };

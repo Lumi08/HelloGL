@@ -34,8 +34,19 @@ private:
 	float mRotation;
 
 	SceneObject* cube;
+	Button* mButton;
+
+	//Lighting
+	Vector4* mLightPosition;
+	Light* mLightData;
+
+	int mouseStartX;
 
 	void InitObjects();
 	void InitGL(int argc, char* argv[]);
+	void InitLighting();
+
+	void DrawString(const char* text, Vector3* position, Color* color);
+	bool MouseInsideButton(Button* b, int mouseX, int mouseY);
 };
 

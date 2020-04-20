@@ -9,19 +9,30 @@ struct Vector3
 	float x, y, z;
 };
 
+struct Vector4
+{
+	float x, y, z, w;
+};
+
 struct Camera
 {
-	Vector3 eye, center, up;
+	Vector3 eye, 
+			center, 
+			up;
 };
 
 struct Color
 {
-	GLfloat r, g, b;
+	GLfloat r, 
+			g, 
+			b;
 };
 
 struct Vertex
 {
-	GLfloat x, y, z;
+	GLfloat x, 
+			y, 
+			z;
 };
 
 struct TexCoord
@@ -30,14 +41,59 @@ struct TexCoord
 			v;
 };
 
+struct Light
+{
+	Vector4 Ambient,
+			Diffuse,
+			Specular;
+};
+
+struct Material
+{
+	Vector4 Ambient,
+			Diffuse,
+			Specular;
+	GLfloat Shininess;
+};
+
 struct Mesh
 {
 	Vertex* Vertices;
-	Color* Color;
+	Vector3* Normals;
 	GLushort* Indices;
 	TexCoord* TexCoords;
 	int VertexCount,
-		ColorCount,
+		NormalCount,
 		IndexCount,
 		TexCoordCount;
+};
+
+struct Button
+{
+	int x, y, w, h;
+
+	Button(int xPos, int yPos, int width, int height)
+	{
+		x = xPos;
+		y = yPos;
+		w = width;
+		h = height;
+	}
+
+	void Draw()
+	{
+		glColor3f(0.6f, 0.6f, 0.6f);
+
+		/*
+		 *	draw background for the button.
+		 */
+		glBegin(GL_QUADS);
+		glVertex2i(x, y);
+		glVertex2i(x, y + h);
+		glVertex2i(x + w, y + h);
+		glVertex2i(x + w, y);
+		glEnd();
+
+		glLineWidth(0.1);
+	}
 };

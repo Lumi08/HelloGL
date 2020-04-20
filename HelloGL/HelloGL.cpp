@@ -1,30 +1,13 @@
 #include "HelloGL.h"
+#include <string>
 #include <iostream>
 
 HelloGL::HelloGL(int argc, char* argv[])
 {
 	InitGL(argc, argv);
 	InitObjects();
+	InitLighting();
 	glutMainLoop();
-}
-
-void HelloGL::InitObjects()
-{
-	mRotation = 0.0f;
-
-	mCamera = new Camera();
-	mCamera->eye = Vector3{ 0.0f, 0.0f, 5.0f };
-	mCamera->center = Vector3{ 0.0f, 0.0f, 0.0f };
-	mCamera->up = Vector3{ 0.0f, 1.0f, 0.0f };
-
-
-	Mesh* cubeMesh = MeshLoader::Load((char*)"Text Files/Cube.txt");
-	//Mesh* pyramidMesh = MeshLoader::Load((char*)"Text Files/Pyramid.txt");
-
-	Texture2D* texture = new Texture2D();
-	texture->Load((char*)"Textures/unnamed.raw", 512, 512);
-
-	cube = new Cube(cubeMesh, texture, 0.0f, 0.0f, 0.0f);
 }
 
 void HelloGL::InitGL(int argc, char* argv[])
@@ -38,7 +21,7 @@ void HelloGL::InitGL(int argc, char* argv[])
 	glutDisplayFunc(GLUTCallbacks::Display);
 	glutKeyboardFunc(GLUTCallbacks::Keyboard);
 	glutMouseFunc(GLUTCallbacks::Mouse);
-	glutTimerFunc(REFRESHRATE, GLUTCallbacks::Timer, REFRESHRATE);
+	glutTimerFunc(REFRESHRATE, GLUTCallbacks::Timer, REFRESHRATE); 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glViewport(0, 0, 800, 800); //Set the viewport to be the entire window
@@ -47,8 +30,45 @@ void HelloGL::InitGL(int argc, char* argv[])
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
 	glCullFace(GL_BACK);
 	
+}
+
+void HelloGL::InitObjects()
+{
+	mRotation = 0.0f;
+
+	mCamera = new Camera();
+	mCamera->eye = Vector3{ 0.0f, 0.0f, 10.0f };
+	mCamera->center = Vector3{ 0.0f, 0.0f, 0.0f };
+	mCamera->up = Vector3{ 0.0f, 1.0f, 0.0f };
+
+	Mesh* cubeMesh = MeshLoader::Load((char*)"Text Files/Cube.txt");
+	//Mesh* pyramidMesh = MeshLoader::Load((char*)"Text Files/Pyramid.txt");
+
+	Texture2D* texture = new Texture2D();
+	texture->Load((char*)"Textures/unnamed.raw", 512, 512);
+
+	/*for (int i = 0; i < 100; i++)
+	{
+		mObjects[i] = new Cube(cubeMesh, texture, ((rand() % 400) / 10.0f) - 20.0f, ((rand() % 200) / 10.0f) - 10.0f, -(rand() % 1000 / 10.0f));
+	}*/
+
+	cube = new Cube(cubeMesh, nullptr, 0.0f, 0.0f, 0.0f);
+	mButton = new Button(10, 10, 300, 50);
+
+}
+
+void HelloGL::InitLighting()
+{
+	mLightPosition = new Vector4{ 0.0, 0.0, 1.0, 0.0 };
+	
+	mLightData = new Light();
+	mLightData->Ambient = Vector4{ 0.2, 0.2, 0.2, 1.0 };
+	mLightData->Diffuse = Vector4{ 0.8, 0.8, 0.8, 1.0 };
+	mLightData->Specular = Vector4{ 0.2, 0.2, 0.2, 1.0 };
 }
 
 HelloGL::~HelloGL(void)
@@ -61,9 +81,34 @@ void HelloGL::Display()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glRotatef(mRotation, 1.0f, 1.0f, 1.0f);
+	//glRotatef(mRotation, 1.0f, 1.0f, 1.0f);
 
 	cube->Draw();
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0.0, 800, 800, 0.0, -1.0, 10.0);
+	glMatrixMode(GL_MODELVIEW);
+	//glPushMatrix();        ----Not sure if I need this
+	glLoadIdentity();
+	glDisable(GL_CULL_FACE);
+
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	//DrawString((std::to_string(mRotation)).c_str(), new Vector3{ -3.4f, 0.7f, 1.0f }, new Color{ 0.0f, 1.0f, 0.0f });
+	/*for (int i = 0; i < 100; i++)
+	{
+		mObjects[i]->Draw();
+	}*/
+
+	mButton->Draw();
+
+	// Making sure we can render 3d again
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	//glPopMatrix();        ----and this?
 
 	glFlush();
 	glutSwapBuffers();
@@ -76,6 +121,12 @@ void HelloGL::Update()
 		mCamera->center.x, mCamera->center.y, mCamera->center.z,
 		mCamera->up.x, mCamera->up.y, mCamera->up.z); //where to look in the scene
 
+	glLightfv(GL_LIGHT0, GL_AMBIENT, &(mLightData->Ambient.x));
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, &(mLightData->Diffuse.x));
+	glLightfv(GL_LIGHT0, GL_SPECULAR, &(mLightData->Specular.x));
+	glLightfv(GL_LIGHT0, GL_POSITION, &(mLightPosition->x));
+
+	cube->Update();
 
 	//Sleep(10);
 	mRotation += 0.5;
@@ -100,19 +151,79 @@ void HelloGL::Keyboard(unsigned char key, int x, int y)
 	mCamera->eye.z -= 0.1; Zooms in
 	mCamera->eye.z += 0.1; Zooms out
 	*/
+	if (key == 'e')
+	{
+		mCamera->eye.x += 0.1;
+	}
+
+	if (key == 'a')
+	{
+		cube->SetTexture((char*)"Textures/Penguins.raw", 512, 512);
+	}
+
+	if (key == 'd')
+	{
+		cube->SetTexture((char*)"Textures/unnamed.raw", 512, 512);
+	}
+
+	if (key == 'q')
+	{
+		cube->ClearTexture();
+	}
 }
 
 void HelloGL::Mouse(int button, int state, int x, int y)
 {
 	if (button == 3)
 	{
-		mCamera->eye.z += 0.1;
+		//mCamera->eye.z += 0.1;
+		cube->SetZ(cube->GetZ() - 0.1);
 	}
 
 	if (button == 4)
 	{
-		mCamera->eye.z -= 0.1;
+		cube->SetZ(cube->GetZ() + 0.1);
 	}
+
+	if (button == 0)
+	{
+		if (state == GLUT_DOWN)
+		{
+			if (MouseInsideButton(mButton, x, y))
+			{
+				cube->SetTexture((char*)"Textures/Penguins.raw", 512, 512);
+			}
+		}
+
+		if (state == GLUT_UP)
+		{
+			if (mouseStartX > x)
+			{
+				std::cout << "Moved left" << std::endl;
+				mouseStartX = 0;
+			}
+		}
+	}
+}
+
+void HelloGL::DrawString(const char* text, Vector3* position, Color* color)
+{
+	glPushMatrix();
+
+	glTranslatef(position->x, position->y, position->z);
+	glRasterPos2f(0.0f, 0.0f);
+	glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_10, (unsigned char*)text);
+
+	glPopMatrix();
+}
+
+bool HelloGL::MouseInsideButton(Button* b, int mouseX, int mouseY)
+{
+	if (mouseX >= b->x && mouseX < b->x + b->w && mouseY >= b->y && mouseY < b->y + b->h)
+	{
+		return true;
+	}
+	return false;
 }
 
 
