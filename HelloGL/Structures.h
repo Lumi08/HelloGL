@@ -82,18 +82,13 @@ struct Button
 
 	void Draw()
 	{
-		glColor3f(0.6f, 0.6f, 0.6f);
-
-		/*
-		 *	draw background for the button.
-		 */
+		glColor4f(0.6f, 0.6f, 0.6f, 1.0f);
+		
 		glBegin(GL_QUADS);
 		glVertex2i(x, y);
 		glVertex2i(x, y + h);
 		glVertex2i(x + w, y + h);
 		glVertex2i(x + w, y);
 		glEnd();
-
-		glLineWidth(0.1);
 	}
 };

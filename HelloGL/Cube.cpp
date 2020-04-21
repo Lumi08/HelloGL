@@ -38,10 +38,10 @@ void Cube::Draw()
 
 			glTranslatef(mPosition->x, mPosition->y, mPosition->z);		
 			glRotatef(mRotation, 1.0f, 1.0f, 1.0f);
-			glMaterialfv(GL_FRONT, GL_AMBIENT, &(mMaterial->Ambient.x));
+			/*glMaterialfv(GL_FRONT, GL_AMBIENT, &(mMaterial->Ambient.x));
 			glMaterialfv(GL_FRONT, GL_DIFFUSE, &(mMaterial->Diffuse.x));
 			glMaterialfv(GL_FRONT, GL_AMBIENT, &(mMaterial->Specular.x));
-			glMaterialfv(GL_FRONT, GL_SHININESS, &mMaterial->Shininess);
+			glMaterialfv(GL_FRONT, GL_SHININESS, &mMaterial->Shininess);*/
 			//glRotatef(mRotation, 1.0f, 0.0f, 1.0f);
 
 			glVertexPointer(3, GL_FLOAT, 0, mMesh->Vertices);

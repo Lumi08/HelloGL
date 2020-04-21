@@ -81,34 +81,42 @@ void HelloGL::Display()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//glRotatef(mRotation, 1.0f, 1.0f, 1.0f);
+	glEnable(GL_DEPTH);
+	glEnable(GL_LIGHTING);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45, 1, 0.1, 1000);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	//Draw 3D
 
 	cube->Draw();
 
+	//End 3D Drawing
+
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+
 	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
 	glLoadIdentity();
-	glOrtho(0.0, 800, 800, 0.0, -1.0, 10.0);
+	glOrtho(0, 800, 800, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
-	//glPushMatrix();        ----Not sure if I need this
 	glLoadIdentity();
-	glDisable(GL_CULL_FACE);
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	//DrawString((std::to_string(mRotation)).c_str(), new Vector3{ -3.4f, 0.7f, 1.0f }, new Color{ 0.0f, 1.0f, 0.0f });
-	/*for (int i = 0; i < 100; i++)
-	{
-		mObjects[i]->Draw();
-	}*/
+	//Draw 2D
 
 	mButton->Draw();
 
-	// Making sure we can render 3d again
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	//glPopMatrix();        ----and this?
+	glRasterPos2f(200, 200);
+	
+	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+	glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, (const unsigned char*)"Testing");
+
+	//End 2D Drawing
 
 	glFlush();
 	glutSwapBuffers();
