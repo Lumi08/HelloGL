@@ -5,5 +5,6 @@
 namespace MeshLoader
 {
 	Mesh* Load(char* path);
+	Mesh* LoadObj(char* filename);
 };
 

@@ -45,7 +45,7 @@ void HelloGL::InitObjects()
 	mCamera->center = Vector3{ 0.0f, 0.0f, 0.0f };
 	mCamera->up = Vector3{ 0.0f, 1.0f, 0.0f };
 
-	Mesh* cubeMesh = MeshLoader::Load((char*)"Text Files/Cube.txt");
+	Mesh* cubeMesh = MeshLoader::LoadObj((char*)"Text Files/jar.obj");
 	//Mesh* pyramidMesh = MeshLoader::Load((char*)"Text Files/Pyramid.txt");
 
 	Texture2D* texture = new Texture2D();
@@ -63,7 +63,7 @@ void HelloGL::InitObjects()
 
 void HelloGL::InitLighting()
 {
-	mLightPosition = new Vector4{ 0.0, 0.0, 1.0, 0.0 };
+	mLightPosition = new Vector4{ 0.0, 0.0, 10.0, 0.0 };
 	
 	mLightData = new Light();
 	mLightData->Ambient = Vector4{ 0.2, 0.2, 0.2, 1.0 };
@@ -83,6 +83,7 @@ void HelloGL::Display()
 
 	glEnable(GL_DEPTH);
 	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -98,6 +99,7 @@ void HelloGL::Display()
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -111,9 +113,9 @@ void HelloGL::Display()
 
 	mButton->Draw();
 
-	glRasterPos2f(200, 200);
 	
 	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+	glRasterPos2f(200, 200);
 	glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, (const unsigned char*)"Testing");
 
 	//End 2D Drawing
@@ -124,10 +126,7 @@ void HelloGL::Display()
 
 void HelloGL::Update()
 {
-	glLoadIdentity(); // loads identity matrix
-	gluLookAt(mCamera->eye.x, mCamera->eye.y, mCamera->eye.z,
-		mCamera->center.x, mCamera->center.y, mCamera->center.z,
-		mCamera->up.x, mCamera->up.y, mCamera->up.z); //where to look in the scene
+	glMatrixMode(GL_PROJECTION); glLoadIdentity(); gluPerspective(50.0, 1.0, 3.0, 17.0); glMatrixMode(GL_MODELVIEW); glLoadIdentity(); gluLookAt(0.0, 0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); //where to look in the scene
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, &(mLightData->Ambient.x));
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, &(mLightData->Diffuse.x));
@@ -135,14 +134,6 @@ void HelloGL::Update()
 	glLightfv(GL_LIGHT0, GL_POSITION, &(mLightPosition->x));
 
 	cube->Update();
-
-	//Sleep(10);
-	mRotation += 0.5;
-
-	if (mRotation > 360.0f)
-	{
-		mRotation = 0.0f;
-	}
 
 	glutPostRedisplay();
 }
@@ -159,9 +150,9 @@ void HelloGL::Keyboard(unsigned char key, int x, int y)
 	mCamera->eye.z -= 0.1; Zooms in
 	mCamera->eye.z += 0.1; Zooms out
 	*/
-	if (key == 'e')
+	if (key == 'w')
 	{
-		mCamera->eye.x += 0.1;
+		mCamera->eye.z += 0.1;
 	}
 
 	if (key == 'a')
@@ -185,12 +176,12 @@ void HelloGL::Mouse(int button, int state, int x, int y)
 	if (button == 3)
 	{
 		//mCamera->eye.z += 0.1;
-		cube->SetZ(cube->GetZ() - 0.1);
+		cube->SetZ(cube->GetZ() - 1);
 	}
 
 	if (button == 4)
 	{
-		cube->SetZ(cube->GetZ() + 0.1);
+		cube->SetZ(cube->GetZ() + 1);
 	}
 
 	if (button == 0)
