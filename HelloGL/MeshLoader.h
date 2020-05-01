@@ -4,7 +4,7 @@
 
 namespace MeshLoader
 {
-	Mesh* Load(char* path);
-	Mesh* LoadObj(char* filename);
+	Mesh* Load(const char* path);
+	Mesh* LoadSimpleObj(char* filename);
 };
 

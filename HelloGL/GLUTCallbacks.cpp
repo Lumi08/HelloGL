@@ -42,6 +42,14 @@ namespace GLUTCallbacks
 		}
 	}
 
+	void KeyboardUp(unsigned char key, int x, int y)
+	{
+		if (helloGl != nullptr)
+		{
+			helloGl->KeyboardUp(key, x, y);
+		}
+	}
+
 	void Mouse(int button, int state, int x, int y)
 	{
 		if (helloGl != nullptr)

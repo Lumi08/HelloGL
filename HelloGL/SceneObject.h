@@ -21,6 +21,10 @@ public:
 	void SetZ(float z) { mPosition->z = z; }
 
 	void SetTexture(char* path, int width, int height);
+	void SetTexture(Texture2D* texture) { mTexture = texture; }
+
+
+	void SetMesh(Mesh* mesh) { mMesh = mesh; }
 
 protected:
 	Mesh* mMesh;

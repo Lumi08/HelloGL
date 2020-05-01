@@ -148,7 +148,7 @@ namespace MeshLoader
 		}
 	}
 
-	Mesh* MeshLoader::Load(char* path)
+	Mesh* MeshLoader::Load(const char* path)
 	{
 		Mesh* mesh = new Mesh();
 
@@ -168,18 +168,18 @@ namespace MeshLoader
 		LoadNormals(inFile, *mesh);
 		LoadIndices(inFile, *mesh);
 
-		Print(*mesh);
+		//Print(*mesh);
 
 		return mesh;
 	}
 
-	Mesh* MeshLoader::LoadObj(char* fileName)
+	Mesh* MeshLoader::LoadSimpleObj(char* fileName)
 	{
 		ifstream inFile(fileName, ios::in);
 		if (!inFile)
 		{
 			cerr << "Cant open file: " << fileName << endl;
-			return false;
+			return nullptr;
 		}
 
 		std::vector<Vertex> vertices;
@@ -235,7 +235,7 @@ namespace MeshLoader
 
 	//Mesh* MeshLoader::LoadObj(char* filename)
 	//{
-	//	Mesh* mesh = new Mesh();
+	//	
 
 	//	ifstream inFile(filename, ios::in);
 	//	if (!inFile)
@@ -309,39 +309,47 @@ namespace MeshLoader
 	//			ss.ignore(1, '/');
 	//			ss >> normalIndex[2];
 
-	//			cout << vertexIndex[0] << "/" << uvIndex[0] << "/" << normalIndex[0] << " " << vertexIndex[1] << "/" << uvIndex[1] << "/" << normalIndex[1] << " " << vertexIndex[2] << "/" << uvIndex[2] << "/" << normalIndex[2] << endl;
+	//			//cout << vertexIndex[0] << "/" << uvIndex[0] << "/" << normalIndex[0] << " " << vertexIndex[1] << "/" << uvIndex[1] << "/" << normalIndex[1] << " " << vertexIndex[2] << "/" << uvIndex[2] << "/" << normalIndex[2] << endl;
 
-	//			vertexIndices.push_back(vertexIndex[0]);
-	//			vertexIndices.push_back(vertexIndex[1]);
-	//			vertexIndices.push_back(vertexIndex[2]);
-	//			uvIndices.push_back(uvIndex[0]);
-	//			uvIndices.push_back(uvIndex[1]);
-	//			uvIndices.push_back(uvIndex[2]);
-	//			normalIndices.push_back(normalIndex[0]);
-	//			normalIndices.push_back(normalIndex[1]);
-	//			normalIndices.push_back(normalIndex[2]);
+	//			vertexIndices.push_back(vertexIndex[0] -1);
+	//			vertexIndices.push_back(vertexIndex[1] -1);
+	//			vertexIndices.push_back(vertexIndex[2] -1);
+	//			uvIndices.push_back(uvIndex[0] -1);
+	//			uvIndices.push_back(uvIndex[1] -1);
+	//			uvIndices.push_back(uvIndex[2] -1);
+	//			normalIndices.push_back(normalIndex[1] -1);
+	//			normalIndices.push_back(normalIndex[1] -1);
+	//			normalIndices.push_back(normalIndex[1] -1);
 	//		}
 	//	}
 
-	//	for (unsigned int i = 0; i < vertexIndices.size(); i++) 
+	//	mesh->VertexCount = temp_vertices.size();
+	//	mesh->Vertices = new Vertex[mesh->VertexCount];
+	//	for (int i = 0; i < temp_vertices.size(); i++)
 	//	{
-	//		unsigned int vertexIndex = vertexIndices[i];
-	//		Vertex vertex = temp_vertices[vertexIndex];
-	//		mesh->Vertices[i] = vertex;
+	//		mesh->Vertices[i] = temp_vertices[i];
 	//	}
 
-	//	for (int i = 0; i < temp_normals.size(); i++)
-	//	{
-	//		mesh->TexCoords[i] = temp_uvs[i];
-	//	}
-
+	//	mesh->NormalCount = temp_normals.size();
+	//	mesh->Normals = new Vector3[mesh->NormalCount];
 	//	for (int i = 0; i < temp_normals.size(); i++)
 	//	{
 	//		mesh->Normals[i] = temp_normals[i];
 	//	}
 
-	//	cout << "---------------" << endl;
-	//	Print(*mesh);
+	//	mesh->TexCoordCount = temp_uvs.size();
+	//	mesh->TexCoords = new TexCoord[mesh->TexCoordCount];
+	//	for (int i = 0; i < temp_uvs.size(); i++)
+	//	{
+	//		mesh->TexCoords[i] = temp_uvs[i];
+	//	}
+
+	//	mesh->IndexCount = vertexIndices.size();
+	//	mesh->Indices = new GLushort[mesh->IndexCount];
+	//	for (int i = 0; i < vertexIndices.size(); i++)
+	//	{
+	//		mesh->Indices[i] = vertexIndices[i];
+	//	}
 
 	//	return mesh;
 	//}

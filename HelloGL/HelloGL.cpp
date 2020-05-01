@@ -1,6 +1,9 @@
 #include "HelloGL.h"
 #include <string>
 #include <iostream>
+#include <vector>
+#include <string>
+#include <Windows.h>
 
 HelloGL::HelloGL(int argc, char* argv[])
 {
@@ -20,12 +23,13 @@ void HelloGL::InitGL(int argc, char* argv[])
 	glutCreateWindow("Simple OpenGl program");
 	glutDisplayFunc(GLUTCallbacks::Display);
 	glutKeyboardFunc(GLUTCallbacks::Keyboard);
+	glutKeyboardUpFunc(GLUTCallbacks::KeyboardUp);
 	glutMouseFunc(GLUTCallbacks::Mouse);
 	glutTimerFunc(REFRESHRATE, GLUTCallbacks::Timer, REFRESHRATE); 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glViewport(0, 0, 800, 800); //Set the viewport to be the entire window
-	gluPerspective(45, 1, 0.1, 1000); //Set the correct perspective
+	gluPerspective(45, 1, 0.1, 100); //Set the correct perspective
 	glMatrixMode(GL_MODELVIEW);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
@@ -38,37 +42,89 @@ void HelloGL::InitGL(int argc, char* argv[])
 
 void HelloGL::InitObjects()
 {
-	mRotation = 0.0f;
+	mRotationValue = 0.0f;
+	mRotationValueX = 0.0f;
+	mRotationValueY = 0.0f;
+	mRotationValueZ = 0.0f;
+	mCurrentTextureIndex = 0;
 
 	mCamera = new Camera();
 	mCamera->eye = Vector3{ 0.0f, 0.0f, 10.0f };
 	mCamera->center = Vector3{ 0.0f, 0.0f, 0.0f };
 	mCamera->up = Vector3{ 0.0f, 1.0f, 0.0f };
 
-	Mesh* cubeMesh = MeshLoader::LoadObj((char*)"Text Files/jar.obj");
+	Mesh* cubeMesh = MeshLoader::Load((char*)"Models/cube.txt");
 	//Mesh* pyramidMesh = MeshLoader::Load((char*)"Text Files/Pyramid.txt");
 
 	Texture2D* texture = new Texture2D();
 	texture->Load((char*)"Textures/unnamed.raw", 512, 512);
 
-	/*for (int i = 0; i < 100; i++)
-	{
-		mObjects[i] = new Cube(cubeMesh, texture, ((rand() % 400) / 10.0f) - 20.0f, ((rand() % 200) / 10.0f) - 10.0f, -(rand() % 1000 / 10.0f));
-	}*/
+	InitTextures();
+	InitMeshes();
 
-	cube = new Cube(cubeMesh, nullptr, 0.0f, 0.0f, 0.0f);
-	mButton = new Button(10, 10, 300, 50);
-
+	mInMenu = true;
+	mModel = new Model(cubeMesh, &mTextures[0], 0.0f, 0.0f, 0.0f);
+	mChangeTextureButton = new Button(10, 10, 200, 50);
+	mMainMenuButton = new Button(300, 500, 200, 50); 
+	mReloadTexturesButton = new Button(10, 65, 200, 50);
 }
 
 void HelloGL::InitLighting()
 {
-	mLightPosition = new Vector4{ 0.0, 0.0, 10.0, 0.0 };
+	mLightPosition = new Vector4{ 0.0, 0.0, 1.0, 0.0 };
 	
 	mLightData = new Light();
 	mLightData->Ambient = Vector4{ 0.2, 0.2, 0.2, 1.0 };
 	mLightData->Diffuse = Vector4{ 0.8, 0.8, 0.8, 1.0 };
 	mLightData->Specular = Vector4{ 0.2, 0.2, 0.2, 1.0 };
+}
+
+void HelloGL::InitTextures()
+{
+	std::vector<std::string> fileNames;
+	std::string directory = "Textures/*.*";
+	WIN32_FIND_DATA fileData;
+	HANDLE hFind;
+
+	if (!((hFind = FindFirstFile(directory.c_str(), &fileData)) == INVALID_HANDLE_VALUE)) {
+		while (FindNextFile(hFind, &fileData)) {
+			fileNames.push_back(fileData.cFileName);
+			mTextureNames.push_back(fileData.cFileName);
+		}
+	}
+	FindClose(hFind);
+
+	mTextures = new Texture2D[fileNames.size()];
+	mTextureCount = fileNames.size();
+	std::string fileLocation = "Textures/";
+	for (int i = 0; i < fileNames.size(); i++)
+	{
+		mTextures[i].Load((fileLocation + fileNames[i]).c_str(), 512, 512);
+	}
+}
+
+void HelloGL::InitMeshes()
+{
+	std::vector<std::string> fileNames;
+	std::string directory = "Models/*.*";
+	WIN32_FIND_DATA fileData;
+	HANDLE hFind;
+
+	if (!((hFind = FindFirstFile(directory.c_str(), &fileData)) == INVALID_HANDLE_VALUE)) {
+		while (FindNextFile(hFind, &fileData)) {
+			fileNames.push_back(fileData.cFileName);
+		}
+	}
+	FindClose(hFind);
+
+	mMeshes = new Mesh*[fileNames.size()];
+	mMeshesCount = fileNames.size();
+	std::string fileLocation = "Models/";
+	for (int i = 0; i < fileNames.size(); i++)
+	{
+		std::cout << fileNames[i] << " Loaded" << std::endl;
+		mMeshes[i] = MeshLoader::Load((fileLocation + fileNames[i]).c_str());
+	}
 }
 
 HelloGL::~HelloGL(void)
@@ -90,10 +146,16 @@ void HelloGL::Display()
 	gluPerspective(45, 1, 0.1, 1000);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	gluLookAt(mCamera->eye.x, mCamera->eye.y, mCamera->eye.z, mCamera->center.x, mCamera->center.y, mCamera->center.z, mCamera->up.x, mCamera->up.y, mCamera->up.z);
 
 	//Draw 3D
 
-	cube->Draw();
+	if (!mInMenu)
+	{
+		glRotatef(mRotationValueX, 1.0f, 0.0f, 0.0f);
+		glRotatef(mRotationValueY, 0.0f, 1.0f, 0.0f);
+		mModel->Draw();
+	}
 
 	//End 3D Drawing
 
@@ -111,12 +173,29 @@ void HelloGL::Display()
 
 	//Draw 2D
 
-	mButton->Draw();
 
-	
-	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-	glRasterPos2f(200, 200);
-	glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, (const unsigned char*)"Testing");
+	if (mInMenu)
+	{
+		DrawString("Welcome To My OpenGl Project", 250, 100, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("To Add textures add .raw files to the Textures Folder", 100, 200, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("Controls:", 100, 250, Color{ 1.0f, 0.0f, 0.0f }, true);
+		DrawString("W A S D - Control the camera", 100, 300, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("Q - Zooms the camera in", 100, 350, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("E - Zooms the camera out", 100, 400, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("", 100, 450, Color{ 1.0f, 1.0f, 1.0f }, true);
+
+
+		mMainMenuButton->Draw();
+		DrawString("Play", 375, 530, Color{ 0.0f, 0.0f, 0.0f }, true);
+	}
+	else
+	{
+		mChangeTextureButton->Draw();
+		DrawString("Change Texture", 30, 40, Color{ 0.0f, 0.0f, 0.0f }, true);
+		DrawString(("Current Texture: " + mTextureNames.at(mCurrentTextureIndex)).c_str(), 30, 700, Color{ 1.0f, 1.0f, 1.0f }, true);
+		mReloadTexturesButton->Draw();
+		DrawString("Reload Textures", 30, 95, Color{ 0.0f, 0.0f, 0.0f }, true);
+	}
 
 	//End 2D Drawing
 
@@ -126,14 +205,21 @@ void HelloGL::Display()
 
 void HelloGL::Update()
 {
-	glMatrixMode(GL_PROJECTION); glLoadIdentity(); gluPerspective(50.0, 1.0, 3.0, 17.0); glMatrixMode(GL_MODELVIEW); glLoadIdentity(); gluLookAt(0.0, 0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); //where to look in the scene
+	//glMatrixMode(GL_PROJECTION); 
+	//glLoadIdentity(); 
+	//gluLookAt(mCamera->eye.x, mCamera->eye.y, mCamera->eye.z, mCamera->center.x, mCamera->center.y, mCamera->center.z, mCamera->up.x, mCamera->up.y, mCamera->up.z); //where to look in the scene
+
+	//std::cout <<"eye x: " << mCamera->eye.x << " eye Y: " <<  mCamera->eye.y << " eye Y: " << mCamera->eye.z << " center X: " << mCamera->center.x << " center Y: " << mCamera->center.y << " center z: " << mCamera->center.z << " up X: " << mCamera->up.x << " up Y: " << mCamera->up.y << " up Z: " << mCamera->up.z << std::endl;
+
+	//mCamera->eye.x = sin(glutGet(GLUT_ELAPSED_TIME)) * 10;
+	//mCamera->eye.z = cos(glutGet(GLUT_ELAPSED_TIME)) * 10;
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, &(mLightData->Ambient.x));
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, &(mLightData->Diffuse.x));
 	glLightfv(GL_LIGHT0, GL_SPECULAR, &(mLightData->Specular.x));
 	glLightfv(GL_LIGHT0, GL_POSITION, &(mLightPosition->x));
 
-	cube->Update();
+	mModel->Update();
 
 	glutPostRedisplay();
 }
@@ -152,66 +238,86 @@ void HelloGL::Keyboard(unsigned char key, int x, int y)
 	*/
 	if (key == 'w')
 	{
-		mCamera->eye.z += 0.1;
+		mRotationValueX -= 1.0;
+	}
+
+	if (key == 's')
+	{
+		mRotationValueX += 1.0;
 	}
 
 	if (key == 'a')
 	{
-		cube->SetTexture((char*)"Textures/Penguins.raw", 512, 512);
+		mRotationValueY -= 1.0;
 	}
 
 	if (key == 'd')
 	{
-		cube->SetTexture((char*)"Textures/unnamed.raw", 512, 512);
+		mRotationValueY += 1.0;
 	}
 
 	if (key == 'q')
 	{
-		cube->ClearTexture();
+		mCamera->eye.z -= 0.1;
 	}
+
+	if (key == 'e')
+	{
+		mCamera->eye.z += 0.1;
+	}
+}
+
+void HelloGL::KeyboardUp(unsigned char key, int k, int y)
+{
+
 }
 
 void HelloGL::Mouse(int button, int state, int x, int y)
 {
-	if (button == 3)
-	{
-		//mCamera->eye.z += 0.1;
-		cube->SetZ(cube->GetZ() - 1);
-	}
-
-	if (button == 4)
-	{
-		cube->SetZ(cube->GetZ() + 1);
-	}
-
 	if (button == 0)
 	{
 		if (state == GLUT_DOWN)
 		{
-			if (MouseInsideButton(mButton, x, y))
+			if (MouseInsideButton(mChangeTextureButton, x, y))
 			{
-				cube->SetTexture((char*)"Textures/Penguins.raw", 512, 512);
-			}
-		}
+				mCurrentTextureIndex++;
+				mModel->SetTexture(&mTextures[mCurrentTextureIndex]);
 
-		if (state == GLUT_UP)
-		{
-			if (mouseStartX > x)
+				if (mCurrentTextureIndex >= mTextureCount)
+				{
+					mCurrentTextureIndex = 0;
+				}
+			}
+
+			if (MouseInsideButton(mReloadTexturesButton, x, y))
 			{
-				std::cout << "Moved left" << std::endl;
-				mouseStartX = 0;
+				mModel->SetTexture(&mTextures[0]);
+				InitTextures();
+				mCurrentTextureIndex = 0;
+			}
+
+			if (MouseInsideButton(mMainMenuButton, x, y))
+			{
+				mInMenu = false;
 			}
 		}
 	}
 }
 
-void HelloGL::DrawString(const char* text, Vector3* position, Color* color)
+void HelloGL::DrawString(const char* text, int x, int y, Color color, bool large)
 {
 	glPushMatrix();
 
-	glTranslatef(position->x, position->y, position->z);
-	glRasterPos2f(0.0f, 0.0f);
-	glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_10, (unsigned char*)text);
+	glColor4f(color.r, color.g, color.b, 1.0f);
+	glRasterPos2f(x, y);
+	if (large)
+	{
+		glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, (unsigned char*)text);
+	}
+	else
+	{
+		glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_10, (unsigned char*)text);
+	}
 
 	glPopMatrix();
 }
