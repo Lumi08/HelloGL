@@ -23,7 +23,6 @@ void HelloGL::InitGL(int argc, char* argv[])
 	glutCreateWindow("Simple OpenGl program");
 	glutDisplayFunc(GLUTCallbacks::Display);
 	glutKeyboardFunc(GLUTCallbacks::Keyboard);
-	glutKeyboardUpFunc(GLUTCallbacks::KeyboardUp);
 	glutMouseFunc(GLUTCallbacks::Mouse);
 	glutTimerFunc(REFRESHRATE, GLUTCallbacks::Timer, REFRESHRATE); 
 	glMatrixMode(GL_PROJECTION);
@@ -64,13 +63,15 @@ void HelloGL::InitObjects()
 	mLoadingObj = false;
 	mObjLoaded = false;
 	mMultipleModels = false;
+	mRotating = false;
 
 	mModels[0] = new Model(mCubeMesh, nullptr, 0.0f, 0.0f, 0.0f);
 	mChangeTextureButton = new Button(10, 10, 200, 50);
-	mMainMenuButton = new Button(300, 500, 200, 50); 
+	mMainMenuButton = new Button(300, 600, 200, 50); 
 	mReloadTexturesButton = new Button(10, 65, 200, 50);
 	mLoadObjButton = new Button(590, 10, 200, 50);
 	mMultipleObjectsButton = new Button(10, 120, 200, 50);
+	mRotateObjectsButton = new Button(10, 175, 200, 50);
 }
 
 void HelloGL::InitLighting()
@@ -149,6 +150,7 @@ void HelloGL::Display()
 			glRotatef(mRotationValueX, 1.0f, 0.0f, 0.0f);
 			glRotatef(mRotationValueY, 0.0f, 1.0f, 0.0f);
 			glRotatef(mRotationValueZ, 0.0f, 0.0f, 1.0f);
+			glRotatef(mRotationValue, 1.0f, 1.0f, 0.0f);
 			mModels[0]->Draw();
 		}
 	}
@@ -177,13 +179,14 @@ void HelloGL::Display()
 		DrawString("Due to Obj Reader Limitations", 100, 200, Color{ 1.0f, 1.0f, 1.0f }, true);
 		DrawString("Texturing is not allowed while a obj is loaded", 100, 230, Color{ 1.0f, 1.0f, 1.0f }, true);
 		DrawString("Lighting is also Disabled while a obj is loaded", 100, 260, Color{ 1.0f, 1.0f, 1.0f }, true);
-		DrawString("Controls:", 100, 300, Color{ 1.0f, 0.0f, 0.0f }, true);
-		DrawString("W A S D Z X - Control the camera", 100, 350, Color{ 1.0f, 1.0f, 1.0f }, true);
-		DrawString("Q - Zooms the camera in", 100, 400, Color{ 1.0f, 1.0f, 1.0f }, true);
-		DrawString("E - Zooms the camera out", 100, 450, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("All obj files are found in Models/", 100, 290, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("Controls:", 100, 400, Color{ 1.0f, 0.0f, 0.0f }, true);
+		DrawString("W A S D Z X - Control the camera", 100, 450, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("Q - Zooms the camera in", 100, 500, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("E - Zooms the camera out", 100, 550, Color{ 1.0f, 1.0f, 1.0f }, true);
 
 		mMainMenuButton->Draw();
-		DrawString("Play", 375, 530, Color{ 0.0f, 0.0f, 0.0f }, true);
+		DrawString("Play", 375, 630, Color{ 0.0f, 0.0f, 0.0f }, true);
 	}
 	else
 	{
@@ -216,6 +219,18 @@ void HelloGL::Display()
 			DrawString("Load Simple Obj", 605, 45, Color{ 0.0f, 0.0f, 0.0f }, true);
 		}
 
+		if (!mMultipleModels)
+		{
+			mRotateObjectsButton->Draw();
+			if (!mRotating)
+			{
+				DrawString("Rotate Object", 30, 205, Color{ 0.0f, 0.0f, 0.0f }, true);
+			}
+			else
+			{
+				DrawString("Stop Rotating", 30, 205, Color{ 0.0f, 0.0f, 0.0f }, true);
+			}
+		}
 		
 
 		if (mLoadingObj)
@@ -269,6 +284,16 @@ void HelloGL::Update()
 			std::cout << "Can not load OBJ: " << path << std::endl;
 		}
 	}
+
+	if (mRotating)
+	{
+		mRotationValue++;
+	}
+	if (mRotationValue >= 360)
+	{
+		mRotationValue = 0;
+	}
+
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, &(mLightData->Ambient.x));
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, &(mLightData->Diffuse.x));
@@ -444,13 +469,18 @@ void HelloGL::Mouse(int button, int state, int x, int y)
 
 					for (int i = 0; i < MAXMODELSCOUNT; i++)
 					{
-						mModels[i] = new Model(mCubeMesh, nullptr, (((rand() % 400) / 10.0f) - 20.0f), ((rand() % 200) / 10.0f) - 10.0f, -(rand() % 1000) / 10.0f);
+						mModels[i] = new Model(mCubeMesh, &mTextures[mCurrentTextureIndex], (((rand() % 400) / 10.0f) - 20.0f), ((rand() % 200) / 10.0f) - 10.0f, -(rand() % 1000) / 10.0f);
 					}
 				}
 				else
 				{
-					mModels[0] = new Model(mCubeMesh, nullptr, 0.0f, 0.0f, 0.0f);
+					mModels[0] = new Model(mCubeMesh, &mTextures[mCurrentTextureIndex], 0.0f, 0.0f, 0.0f);
 				}
+			}
+
+			if (MouseInsideButton(mRotateObjectsButton, x, y))
+			{
+				mRotating = !mRotating;
 			}
 		}
 	}

@@ -44,7 +44,7 @@ private:
 	Button* mLoadObjButton;
 	Button* mMainMenuButton;
 	Button* mMultipleObjectsButton;
-	Vector3 mRotation;
+	Button* mRotateObjectsButton;
 
 	//Lighting
 	Vector4* mLightPosition;
@@ -58,7 +58,8 @@ private:
 	int mCurrentTextureIndex,
 		mTextureCount,
 		mMeshesCount,
-		mMultipleModels;
+		mMultipleModels, 
+		mRotating;
 
 	int mouseStartX;
 	bool mInMenu,
