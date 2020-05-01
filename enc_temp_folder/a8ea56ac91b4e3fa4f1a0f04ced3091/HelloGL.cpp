@@ -54,6 +54,7 @@ void HelloGL::InitObjects()
 	mCamera->up = Vector3{ 0.0f, 1.0f, 0.0f };
 	
 	mCubeMesh = MeshLoader::Load((char*)"Models/cube.txt");
+	//Mesh* pyramidMesh = MeshLoader::Load((char*)"Text Files/Pyramid.txt");
 
 	Texture2D* texture = new Texture2D();
 	texture->Load((char*)"Textures/unnamed.raw", 512, 512);
@@ -233,6 +234,15 @@ void HelloGL::Display()
 
 void HelloGL::Update()
 {
+	//glMatrixMode(GL_PROJECTION); 
+	//glLoadIdentity(); 
+	//gluLookAt(mCamera->eye.x, mCamera->eye.y, mCamera->eye.z, mCamera->center.x, mCamera->center.y, mCamera->center.z, mCamera->up.x, mCamera->up.y, mCamera->up.z); //where to look in the scene
+
+	//std::cout <<"eye x: " << mCamera->eye.x << " eye Y: " <<  mCamera->eye.y << " eye Y: " << mCamera->eye.z << " center X: " << mCamera->center.x << " center Y: " << mCamera->center.y << " center z: " << mCamera->center.z << " up X: " << mCamera->up.x << " up Y: " << mCamera->up.y << " up Z: " << mCamera->up.z << std::endl;
+
+	//mCamera->eye.x = sin(glutGet(GLUT_ELAPSED_TIME)) * 10;
+	//mCamera->eye.z = cos(glutGet(GLUT_ELAPSED_TIME)) * 10;
+
 	if (mConsoleOutForObj)
 	{
 
@@ -282,6 +292,16 @@ void HelloGL::Update()
 
 void HelloGL::Keyboard(unsigned char key, int x, int y)
 {
+	/*
+	mCamera->eye.x += 0.1; Moves the camera to the left
+	mCamera->eye.x -= 0.1; Moves the camera to the right
+
+	mCamera->eye.y -= 0.1; Moves the camera up
+	mCamera->eye.y += 0.1; Moves the camer down
+
+	mCamera->eye.z -= 0.1; Zooms in
+	mCamera->eye.z += 0.1; Zooms out
+	*/
 	if (key == 'w')
 	{
 		if (mMultipleModels)
@@ -432,7 +452,7 @@ void HelloGL::Mouse(int button, int state, int x, int y)
 			{
 				mInMenu = false;
 			}
-			
+
 			if (MouseInsideButton(mMultipleObjectsButton, x, y))
 			{
 				mMultipleModels = !mMultipleModels;

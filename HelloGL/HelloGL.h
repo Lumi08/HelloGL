@@ -13,6 +13,7 @@
 #include "MeshLoader.h"
 
 #define REFRESHRATE		16
+#define MAXMODELSCOUNT	200
 
 class HelloGL
 {
@@ -32,17 +33,17 @@ public:
 
 private: 
 	Camera* mCamera;
-	SceneObject* mObjects[200];
+	SceneObject* mModels[MAXMODELSCOUNT];
 	float mRotationValue;
 	float mRotationValueX;
 	float mRotationValueY;
 	float mRotationValueZ;
 
-	SceneObject* mModel;
 	Button* mChangeTextureButton;
 	Button* mReloadTexturesButton;
 	Button* mLoadObjButton;
 	Button* mMainMenuButton;
+	Button* mMultipleObjectsButton;
 	Vector3 mRotation;
 
 	//Lighting
@@ -56,7 +57,8 @@ private:
 
 	int mCurrentTextureIndex,
 		mTextureCount,
-		mMeshesCount;
+		mMeshesCount,
+		mMultipleModels;
 
 	int mouseStartX;
 	bool mInMenu,
@@ -68,7 +70,6 @@ private:
 	void InitGL(int argc, char* argv[]);
 	void InitLighting();
 	void InitTextures();
-	void InitMeshes();
 
 	void DrawString(const char* text, int x, int y, Color color, bool large);
 	bool MouseInsideButton(Button* b, int mouseX, int mouseY);
