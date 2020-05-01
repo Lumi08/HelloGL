@@ -30,10 +30,6 @@ public:
 	void KeyboardUp(unsigned char key, int k, int y);
 	void Mouse(int button, int state, int x, int y);
 
-
-
-
-
 private: 
 	Camera* mCamera;
 	SceneObject* mObjects[200];
@@ -45,6 +41,7 @@ private:
 	SceneObject* mModel;
 	Button* mChangeTextureButton;
 	Button* mReloadTexturesButton;
+	Button* mLoadObjButton;
 	Button* mMainMenuButton;
 	Vector3 mRotation;
 
@@ -55,13 +52,17 @@ private:
 	Texture2D* mTextures;
 	std::vector<std::string> mTextureNames;
 	Mesh** mMeshes;
+	Mesh* mCubeMesh;
 
 	int mCurrentTextureIndex,
 		mTextureCount,
 		mMeshesCount;
 
 	int mouseStartX;
-	bool mInMenu;
+	bool mInMenu,
+		mLoadingObj, 
+		mConsoleOutForObj,
+		mObjLoaded = true;
 
 	void InitObjects();
 	void InitGL(int argc, char* argv[]);

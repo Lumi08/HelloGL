@@ -52,8 +52,8 @@ void HelloGL::InitObjects()
 	mCamera->eye = Vector3{ 0.0f, 0.0f, 10.0f };
 	mCamera->center = Vector3{ 0.0f, 0.0f, 0.0f };
 	mCamera->up = Vector3{ 0.0f, 1.0f, 0.0f };
-
-	Mesh* cubeMesh = MeshLoader::Load((char*)"Models/cube.txt");
+	
+	mCubeMesh = MeshLoader::Load((char*)"Models/cube.txt");
 	//Mesh* pyramidMesh = MeshLoader::Load((char*)"Text Files/Pyramid.txt");
 
 	Texture2D* texture = new Texture2D();
@@ -63,10 +63,13 @@ void HelloGL::InitObjects()
 	InitMeshes();
 
 	mInMenu = true;
-	mModel = new Model(cubeMesh, &mTextures[0], 0.0f, 0.0f, 0.0f);
+	mLoadingObj = false;
+	mObjLoaded = false;
+	mModel = new Model(mCubeMesh, nullptr, 0.0f, 0.0f, 0.0f);
 	mChangeTextureButton = new Button(10, 10, 200, 50);
 	mMainMenuButton = new Button(300, 500, 200, 50); 
 	mReloadTexturesButton = new Button(10, 65, 200, 50);
+	mLoadObjButton = new Button(590, 10, 200, 50);
 }
 
 void HelloGL::InitLighting()
@@ -154,6 +157,7 @@ void HelloGL::Display()
 	{
 		glRotatef(mRotationValueX, 1.0f, 0.0f, 0.0f);
 		glRotatef(mRotationValueY, 0.0f, 1.0f, 0.0f);
+		glRotatef(mRotationValueZ, 0.0f, 0.0f, 1.0f);
 		mModel->Draw();
 	}
 
@@ -177,24 +181,43 @@ void HelloGL::Display()
 	if (mInMenu)
 	{
 		DrawString("Welcome To My OpenGl Project", 250, 100, Color{ 1.0f, 1.0f, 1.0f }, true);
-		DrawString("To Add textures add .raw files to the Textures Folder", 100, 200, Color{ 1.0f, 1.0f, 1.0f }, true);
-		DrawString("Controls:", 100, 250, Color{ 1.0f, 0.0f, 0.0f }, true);
-		DrawString("W A S D - Control the camera", 100, 300, Color{ 1.0f, 1.0f, 1.0f }, true);
-		DrawString("Q - Zooms the camera in", 100, 350, Color{ 1.0f, 1.0f, 1.0f }, true);
-		DrawString("E - Zooms the camera out", 100, 400, Color{ 1.0f, 1.0f, 1.0f }, true);
-		DrawString("", 100, 450, Color{ 1.0f, 1.0f, 1.0f }, true);
-
+		DrawString("Due to Obj Reader Limitations", 100, 200, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("Texturing is not allowed while a obj is loaded", 100, 230, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("Lighting is also Disabled while a obj is loaded", 100, 260, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("Controls:", 100, 300, Color{ 1.0f, 0.0f, 0.0f }, true);
+		DrawString("W A S D Z X - Control the camera", 100, 350, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("Q - Zooms the camera in", 100, 400, Color{ 1.0f, 1.0f, 1.0f }, true);
+		DrawString("E - Zooms the camera out", 100, 450, Color{ 1.0f, 1.0f, 1.0f }, true);
 
 		mMainMenuButton->Draw();
 		DrawString("Play", 375, 530, Color{ 0.0f, 0.0f, 0.0f }, true);
 	}
 	else
 	{
-		mChangeTextureButton->Draw();
-		DrawString("Change Texture", 30, 40, Color{ 0.0f, 0.0f, 0.0f }, true);
-		DrawString(("Current Texture: " + mTextureNames.at(mCurrentTextureIndex)).c_str(), 30, 700, Color{ 1.0f, 1.0f, 1.0f }, true);
-		mReloadTexturesButton->Draw();
-		DrawString("Reload Textures", 30, 95, Color{ 0.0f, 0.0f, 0.0f }, true);
+		if (!mObjLoaded)
+		{
+			mChangeTextureButton->Draw();
+			DrawString("Change Texture", 30, 40, Color{ 0.0f, 0.0f, 0.0f }, true);
+			DrawString(("Current Texture: " + mTextureNames.at(mCurrentTextureIndex)).c_str(), 30, 700, Color{ 1.0f, 1.0f, 1.0f }, true);
+			mReloadTexturesButton->Draw();
+			DrawString("Reload Textures", 30, 95, Color{ 0.0f, 0.0f, 0.0f }, true);
+		}
+		
+		mLoadObjButton->Draw();
+		if (mObjLoaded)
+		{
+			DrawString("Return To Cube", 605, 45, Color{ 0.0f, 0.0f, 0.0f }, true);
+		}
+		else
+		{
+			DrawString("Load Simple Obj", 605, 45, Color{ 0.0f, 0.0f, 0.0f }, true);
+		}
+
+		if (mLoadingObj)
+		{
+			DrawString("OPEN CONSOLE", 605, 95, Color{ 1.0f, 0.0f, 0.0f }, true);
+			mConsoleOutForObj = true;
+		}
 	}
 
 	//End 2D Drawing
@@ -213,6 +236,32 @@ void HelloGL::Update()
 
 	//mCamera->eye.x = sin(glutGet(GLUT_ELAPSED_TIME)) * 10;
 	//mCamera->eye.z = cos(glutGet(GLUT_ELAPSED_TIME)) * 10;
+
+	if (mConsoleOutForObj)
+	{
+
+		std::string path;
+		std::cout << "Enter File Path: ";
+		std::cin >> path;
+		std::cout << path << std::endl;
+		mLoadingObj = false;
+		mConsoleOutForObj = false;
+
+		Mesh* tempMesh = new Mesh();
+		tempMesh = MeshLoader::LoadSimpleObj(path.c_str());
+
+		if (tempMesh != nullptr)
+		{
+			mModel->SetTexture(nullptr);
+			mModel->SetMesh(tempMesh);
+			mObjLoaded = true;
+			//mModel = new Model(tempMesh, nullptr, 0.0f, 0.0f, 0.0f);
+		}
+		else
+		{
+			std::cout << "Can not load OBJ: " << path << std::endl;
+		}
+	}
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, &(mLightData->Ambient.x));
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, &(mLightData->Diffuse.x));
@@ -255,6 +304,14 @@ void HelloGL::Keyboard(unsigned char key, int x, int y)
 	{
 		mRotationValueY += 1.0;
 	}
+	if (key == 'x')
+	{
+		mRotationValueZ -= 1.0;
+	}
+	if (key == 'z')
+	{
+		mRotationValueZ += 1.0;
+	}
 
 	if (key == 'q')
 	{
@@ -294,6 +351,19 @@ void HelloGL::Mouse(int button, int state, int x, int y)
 				mModel->SetTexture(&mTextures[0]);
 				InitTextures();
 				mCurrentTextureIndex = 0;
+			}
+
+			if (MouseInsideButton(mLoadObjButton, x, y))
+			{
+				if (mObjLoaded)
+				{
+					mModel->SetMesh(mCubeMesh);
+					mObjLoaded = false;
+				}
+				else
+				{
+					mLoadingObj = true;
+				}
 			}
 
 			if (MouseInsideButton(mMainMenuButton, x, y))

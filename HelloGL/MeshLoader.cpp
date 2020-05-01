@@ -173,7 +173,7 @@ namespace MeshLoader
 		return mesh;
 	}
 
-	Mesh* MeshLoader::LoadSimpleObj(char* fileName)
+	Mesh* MeshLoader::LoadSimpleObj(const char* fileName)
 	{
 		ifstream inFile(fileName, ios::in);
 		if (!inFile)

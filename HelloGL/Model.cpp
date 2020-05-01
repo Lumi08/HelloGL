@@ -20,16 +20,10 @@ void Model::Draw()
 {
 	if (mMesh != nullptr)
 	{
-		if (mMesh->Vertices != nullptr && mMesh->VertexCount != 0 &&
-			mMesh->Normals != nullptr && mMesh->NormalCount != 0 &&
-			mMesh->Indices != nullptr && mMesh->IndexCount != 0)
-		{
-			
-		}
+		
 
 		glPushMatrix();
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_NORMAL_ARRAY);
 
 		if (mTexture != nullptr && mMesh->TexCoordCount > 0)
 		{
@@ -37,6 +31,11 @@ void Model::Draw()
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 			glTexCoordPointer(2, GL_FLOAT, 0, mMesh->TexCoords);
 
+		}
+		if (mMesh->Normals != nullptr)
+		{
+			glEnableClientState(GL_NORMAL_ARRAY);
+			glNormalPointer(GL_FLOAT, 0, mMesh->Normals);
 		}
 
 		glTranslatef(mPosition->x, mPosition->y, mPosition->z);
@@ -48,15 +47,14 @@ void Model::Draw()
 		//glRotatef(mRotation, 1.0f, 0.0f, 1.0f);
 
 		glVertexPointer(3, GL_FLOAT, 0, mMesh->Vertices);
-		glNormalPointer(GL_FLOAT, 0, mMesh->Normals);
 
 		glPushMatrix();
 		glDrawElements(GL_TRIANGLES, mMesh->IndexCount, GL_UNSIGNED_SHORT, mMesh->Indices);
 		glPopMatrix();
 
-		//glDisableClientState(GL_NORMAL_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
-		//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glPopMatrix();
 	}
 }
